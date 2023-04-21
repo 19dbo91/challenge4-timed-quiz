@@ -25,7 +25,7 @@ _______________________________________________________________________________
     THEN the game is over
 
 @ the game is over:
-    THEN I can save my initials and my score
+    THEN I can save my initials and my score //local storage
 
 
 
@@ -50,9 +50,53 @@ on question page -> options(4) -> next question -until out of questions/time->
 options are in ordered list and styled
 
 
-HTML and CSS exclusively on the fly?
 
+Other considerations: media screeen
 Extra features (if code done by weekend)
     
+
+general flow of site
+
+on url load - starting page
+    show prompt centered
+    show view high score button
+    show timer
+    has start button (mid center) ->
+    has view highscore (top left) ->
+    has timer(top right; @ 000)
+
+on button start:
+    get question, ?randomly?
+    show list choices with button ->
+    start timer counting down every second (starting from ?75) ->
+
+on button choice
+    reveal a text below, timed for 2?secs    
+    update score;save it
+
+    (if more questions and time)
+        get next question from list
+        load its choices; ...wait for button choice
+    (else)
+        go to game end
+
+on game end
+    get score
+    show form intials and submit
+
+on submit
+    get leaderboard
+    place score in highest to lowest
+
+on view highscore
+    load leaderboard array of initials and score
+    on button; reset
+    go back to home ->
+
+on reset
+    delete value from local storage
+
+
+
 
 */
