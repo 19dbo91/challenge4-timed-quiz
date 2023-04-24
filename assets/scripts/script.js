@@ -99,7 +99,16 @@ on reset
 
 */
 
+/* References
+ * Regions <https://marketplace.visualstudio.com/items?itemName=MadsKristensen.JavaScriptRegions>
+ * innerHTML vs textContent <https://www.youtube.com/watch?v=1UsllDMhvN4>
+*/ 
 
+
+//Debug printer
+function p(me){console.log(me);}
+
+// #region Cards
 class Card {
     constructor() {
         this.question="";
@@ -116,11 +125,11 @@ class Card {
 }
 let numCards = 4;
 let deck=[]; 
+
 for (let i=0;i<numCards;i++){
     deck[i] = new Card();
 }
 
-/*Instantiating question cards*/
 deck[0].setQuestion("Commonly used data types DO NOT inlcude:");
 deck[0].setAnswer(["strings","booleans", "alerts","numbers"], 2);
 
@@ -132,41 +141,98 @@ deck[2].setAnswer(["numbers and strings", "other arrays", "booleans", "all of th
 
 deck[3].setQuestion("String values must be enclosed within _____ when being assigned to variables.");
 deck[3].setAnswer(["commas", "curly brackets", "quotes", "parenthesis"],2);
+// #endregion
 
+//
+const mainID = document.getElementById("main");
+const titleID = document.getElementById("title");
 
+//Home Page
+const homeTitle="Coding Quiz Challenge";
+const homePrompt="Try to answer the following code-related questions within time limit\nKeep in mind that incorrect answer will penalize your score/time by ten seconds!"
+const startString="Start Quiz"
 
-let elemHeader = document.getElementsByTagName("header");
-let elemMain = document.getElementsByTagName("main");
-let elemFooter = document.getElementsByTagName("footer");
+function createChildTag(parentTag, typeString){
+    let childTag = document.createElement(typeString);
+    parentTag.appendChild(childTag);
+    return childTag;
+}
+function setContent(tag,contentString){
+    tag.textContent = contentString;
+}
+function setID(tag,idString){
+    tag.setAttribute("id",idString);
+}
+function makeIntoButton(tag){
+    tag.setAttribute("class","button");
+    tag.addEventListener("click", function(){
+        p("it worked");
+    });
+}
 
-function p(me){console.log(me);}
-
+function createList(parentTag, itemArray){
+    let newParentList = createChildTag(parentTag,"ol");
+    createListItem(newParentList, itemArray);
+}
+function createListItem(parentList, array){
+    for (let i=0; i<array.length; i++){
+        let newListItem = createChildTag(parentList,"li");        
+        setContent(newListItem, array[i]);
+        newListItem.setAttribute("data-index",i);  
+    };
+}
 
 /*Controls for page */
-function setTitle(questionString){
-    title = document.getElementById("title");
-    p(title);
-    title.textcontent = questionString;
+
+function setPrompt(promptString){
+    let promptTag = createChildTag(mainID,"pre");
+    setContent(promptTag, promptString);
+    setID(promptTag,"prompt");
+}
+function removeID(idString){
+    document.getElementById(idString).remove();
+}
+function createStartButton(){
+    let startButton = createChildTag(mainID,"p");
+    setID(startButton,"start");
+    setContent(startButton,startString);
+    makeIntoButton(startButton);
 }
 
 
+function setList(answerArray){
+
+} //TODO on click answer with qLeft >0; or on start
+
+
+
 /*Initializing home page*/
-setTitle(deck[0].question);
+// TODO: diplaying start pages
+setContent(titleID,homeTitle);
+setPrompt(homePrompt);
+createStartButton();
+
+
+/* Starting questions */
+// TODO: diplaying question pages
+setContent(deck[0].question);
+removeID("prompt"); removeID("start");
+createList(mainID,deck[0].answer);
 
 
 
 
-
-
-
+// TODO: submitting players
 
 
 
 
 // TODO: getting leaderboard on page load
-// TODO: diplaying question pages
-// TODO: diplaying start pages
-// TODO: submitting players 
+ 
 // TODO: storing leaderboard locally
+
+
 // TODO: while in leaderboard, set nav link and 
-// TODO: 
+
+
+
