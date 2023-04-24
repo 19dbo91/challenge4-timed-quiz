@@ -95,8 +95,113 @@ on view highscore
 
 on reset
     delete value from local storage
-
-
-
+    reload display
 
 */
+
+/* saveing this for anothe rday
+
+const myBody = document.body;
+const layout = ["header" , "main", "footer"];
+const headerLayout = ["",""]; 
+const mainLayout = ["h1","p","ol"];
+const footerLayout = ["div"];  
+
+
+
+function bearChildren(arrayChildren, parent){
+    let i=0;
+    arrayChildren.forEach(element => {
+        let bornChild = document.createElement(element); console.log(bornChild);
+        arrayChildren[i]=bornChild;
+        parent.appendChild(bornChild); i++; 
+    });
+}// creates and appends all children under parent
+
+
+
+function init(){
+    bearChildren(layout, myBody); console.log(myBody);
+    let headerElem = layout[0];
+    //bearChildren(headerLayout, header);
+    let mainElem = layout[1]; console.log(mainElem);
+    bearChildren(mainLayout, mainElem);
+
+    let footer = layout[2];
+    bearChildren(footerLayout, footer);
+}
+init();//run ONCE and ONLY in top level
+
+
+mainLayout[0].textcontent = "link here";*/
+
+class Card {
+    constructor() {
+        this.question="";
+        this.answer=[];
+        this.correct=0;
+    }
+    setQuestion(questionString) {
+        this.question = questionString;
+    }
+    setAnswer(answerArray, indexOfCorrect) {
+        this.answer = answerArray;
+        this.correct = indexOfCorrect;
+    }
+}
+let numCards = 4;
+let deck=[]; 
+for (let i=0;i<numCards;i++){
+    deck[i] = new Card();
+}
+
+/*Instantiating question cards*/
+deck[0].setQuestion("Commonly used data types DO NOT inlcude:");
+deck[0].setAnswer(["strings","booleans", "alerts","numbers"], 2);
+
+deck[1].setQuestion("The condition in an if / else statement is enclosed with _____.");
+deck[1].setAnswer(["quotes", "curly brackets", "parenthesis", "square brackets"], 2);
+
+deck[2].setQuestion("Arrays in JavaScript can be used to store _____.");
+deck[2].setAnswer(["numbers and strings", "other arrays", "booleans", "all of the above"], 3);
+
+deck[3].setQuestion("String values must be enclosed within _____ when being assigned to variables.");
+deck[3].setAnswer(["commas", "curly brackets", "quotes", "parenthesis"],2);
+
+
+
+let elemHeader = document.getElementsByTagName("header");
+let elemMain = document.getElementsByTagName("main");
+let elemFooter = document.getElementsByTagName("footer");
+
+function p(me){console.log(me);}
+
+
+/*Controls for page */
+function setTitle(questionString){
+    title = document.getElementById("title");
+    p(title);
+    title.textcontent = questionString;
+}
+
+
+/*Initializing home page*/
+setTitle(deck[0].question);
+
+
+
+
+
+
+
+
+
+
+
+// TODO: getting leaderboard on page load
+// TODO: diplaying question pages
+// TODO: diplaying start pages
+// TODO: submitting players 
+// TODO: storing leaderboard locally
+// TODO: while in leaderboard, set nav link and 
+// TODO: 

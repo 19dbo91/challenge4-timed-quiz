@@ -1,0 +1,22 @@
+:root{
+    --themecolor-default:purple;
+    --themecolor-hover:purple;
+    --themecolor-:purple;
+}
+
+button{
+    background-color: white;
+    border-style: dotted;
+}
+
+button:hover{
+    color: white;
+    background-color: var(--themecolor-default);
+}
+button:active{ /*when being clicked*/
+    color: blue;
+    box-shadow: inset -1px -1px 2px 2px white;
+}
+button:focus{}
+
+/* TODO: add section and h1 content*/
