@@ -99,41 +99,6 @@ on reset
 
 */
 
-/* saveing this for anothe rday
-
-const myBody = document.body;
-const layout = ["header" , "main", "footer"];
-const headerLayout = ["",""]; 
-const mainLayout = ["h1","p","ol"];
-const footerLayout = ["div"];  
-
-
-
-function bearChildren(arrayChildren, parent){
-    let i=0;
-    arrayChildren.forEach(element => {
-        let bornChild = document.createElement(element); console.log(bornChild);
-        arrayChildren[i]=bornChild;
-        parent.appendChild(bornChild); i++; 
-    });
-}// creates and appends all children under parent
-
-
-
-function init(){
-    bearChildren(layout, myBody); console.log(myBody);
-    let headerElem = layout[0];
-    //bearChildren(headerLayout, header);
-    let mainElem = layout[1]; console.log(mainElem);
-    bearChildren(mainLayout, mainElem);
-
-    let footer = layout[2];
-    bearChildren(footerLayout, footer);
-}
-init();//run ONCE and ONLY in top level
-
-
-mainLayout[0].textcontent = "link here";*/
 
 class Card {
     constructor() {
