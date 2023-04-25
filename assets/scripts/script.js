@@ -146,11 +146,33 @@ deck[3].setAnswer(["commas", "curly brackets", "quotes", "parenthesis"],2);
 //
 const mainID = document.getElementById("main");
 const titleID = document.getElementById("title");
+const timeID = document.getElementById("time");
+
+//Time controls
+let myTimer= 0;
+const timePenalty = 10;
+const timeAllotted = 5;
+const timeDelta = 1000; //num is in milliseconds for setInterval funct 
 
 //Home Page
 const homeTitle="Coding Quiz Challenge";
 const homePrompt="Try to answer the following code-related questions within time limit\nKeep in mind that incorrect answer will penalize your score/time by ten seconds!"
 const startString="Start Quiz"
+
+//question
+let questionPointer=0;
+
+
+//Submission page
+const submitTitle="All done";
+let scorePrompt = `Your final score is ${time}.`
+const intials= "Enter initials: "
+
+//Sound
+const wavCorrect = new Audio("./assets/sfx/correct.wav");
+const wavIncorrect = new Audio("./assets/sfx/incorrect.wav");
+
+
 
 function createChildTag(parentTag, typeString){
     let childTag = document.createElement(typeString);
@@ -163,26 +185,22 @@ function setContent(tag,contentString){
 function setID(tag,idString){
     tag.setAttribute("id",idString);
 }
-function makeIntoButton(tag){
-    tag.setAttribute("class","button");
-    tag.addEventListener("click", function(){
-        p("it worked");
-    });
-}
+
 
 function createList(parentTag, itemArray){
     let newParentList = createChildTag(parentTag,"ol");
+    newParentList.setAttribute("id", "answers");
     createListItem(newParentList, itemArray);
 }
 function createListItem(parentList, array){
     for (let i=0; i<array.length; i++){
         let newListItem = createChildTag(parentList,"li");        
         setContent(newListItem, array[i]);
-        newListItem.setAttribute("data-index",i);  
+        newListItem.setAttribute("data-index",i);
     };
 }
 
-/*Controls for page */
+/* Controls for page */
 
 function setPrompt(promptString){
     let promptTag = createChildTag(mainID,"pre");
@@ -196,12 +214,10 @@ function createStartButton(){
     let startButton = createChildTag(mainID,"p");
     setID(startButton,"start");
     setContent(startButton,startString);
-    makeIntoButton(startButton);
+    startButton.addEventListener("click", onClickStart);
 }
 
-
 function setList(answerArray){
-
 } //TODO on click answer with qLeft >0; or on start
 
 
@@ -211,28 +227,57 @@ function setList(answerArray){
 setContent(titleID,homeTitle);
 setPrompt(homePrompt);
 createStartButton();
-
+setContent(timeID,"00");
 
 /* Starting questions */
 // TODO: diplaying question pages
-setContent(deck[0].question);
-removeID("prompt"); removeID("start");
-createList(mainID,deck[0].answer);
+//setContent(titleID, deck[0].question);
+//removeID("prompt"); removeID("start");
+//createList(mainID,deck[0].answer);
+
+
+//removeList(); //todo  
+//setContent(titleID, submitTitle);
+//setPrompt(scorePrompt);
+
+
+function getLocalData(){} // TODO: getting leaderboard on page load
+function setLocalData(){} // TODO: storing leaderboard locally
+
+
+function onClickStart(){
+    startTimer(timeAllotted, timeDelta);
+}
 
 
 
-
-// TODO: submitting players
-
-
-
-
-// TODO: getting leaderboard on page load
- 
-// TODO: storing leaderboard locally
-
-
-// TODO: while in leaderboard, set nav link and 
-
+// Timer
+function startTimer(duration,updateFrequency){
+    setContent(timeID,duration);
+    myTimer = setInterval(update,updateFrequency);
+    function update(){
+        duration--;
+        setContent(timeID,duration);
+        if (duration <= 0){
+            stopTimer();
+        }else{};
+    }
 
 
+}
+
+function stopTimer(){
+    clearInterval(myTimer);
+}// used tostop after out of question
+
+function createWavID(){
+    
+}
+
+function answerWrong(){
+    time -= timeLoss;
+    wavIncorrect.play();
+}
+function answerRight(){
+    wavCorrect.play();
+}
