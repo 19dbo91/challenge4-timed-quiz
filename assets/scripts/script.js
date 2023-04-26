@@ -102,6 +102,8 @@ on reset
 /* References
  * Regions <https://marketplace.visualstudio.com/items?itemName=MadsKristensen.JavaScriptRegions>
  * innerHTML vs textContent <https://www.youtube.com/watch?v=1UsllDMhvN4>
+ * splice <https://www.freecodecamp.org/news/javascript-splice-how-to-use-the-splice-js-array-method/>
+ * attribute - required for input tag <https://bobbyhadz.com/blog/javascript-set-attribute-required>
 */ 
 
 
@@ -163,6 +165,12 @@ const startString="Start Quiz"
 //Submission page
 const submitTitle="All done";
 const finalScore = "Your final score is "
+let leaderboard=[];
+const leaderboardSize =5;
+let player={
+    'initials': "",
+    'score': 0
+};
 
 //Sound
 const wavCorrect = new Audio("./assets/sfx/correct.wav");
@@ -283,13 +291,16 @@ function addForm(){
     setID(formID, "submit-form");
 
     let labelFor = createChildTag(formID,"label");
-    labelFor.setAttribute("for","intials");
+    labelFor.setAttribute("for","initials");
     setContent(labelFor,"Enter Initials: ");
     
     let textBox = createChildTag(formID,"input");
-    setID(textBox, "intials");
     textBox.setAttribute("type","text");
+    setID(textBox, "initials");
+    
     textBox.setAttribute("name","initials");
+    textBox.setAttribute("required","");
+    textBox.setAttribute("maxLength","3");
 
     let submitButton = createChildTag(formID,"button");
     submitButton.setAttribute("type","submit");
@@ -299,25 +310,60 @@ function addForm(){
 
 function onSubmit(event){
     event.preventDefault();
-    p(event);
-    let textBox = document.getElementById("input");
-    let initials = textBox.initials;
-    p();
     saveScore();
+}//possible err due to something?? may need to nest
+
+
+
+function saveScore(){
+    player.initials= document.getElementById("initials").value;
+    player.score=currentTime;
+
+    let previousSave = loadScore();
+    p(previousSave);
+
+
+    if( previousSave == null){
+        let newLeader = [player];
+        localStorage.setItem("hiScore",JSON.stringify(newLeader));
+        p("!! NEW HIGH SCORE !!");
+    }
+    else{
+        let placement = 0;
+
+        p("last best: "+ previousSave[0].value);
+        p("this time: " + player.score);
+        let pastScore = previousSave[placement].score;
+        while(pastScore >= (player.score)){
+            placement++;
+            pastScore = previousSave[placement].score; // ! errors when taken to fast??
+        }//checking where to place new score; new scores that equal old will be placed below
+
+        p("you have placed "+ (placement+1)+"th");
+        previousSave.splice(placement,0,player);
+        
+        while(previousSave.length>5){
+             p("popping off "+ previousSave.pop());
+        }
+        localStorage.setItem("hiScore",JSON.stringify(previousSave));
+    }
     setHiScoreLayout();
 }
 
 
-function saveScore(){
-}
 function loadScore(){
-    let leaderboardArray=[];
-    return leaderboardArray;
-}
+    return JSON.parse(localStorage.getItem("hiScore"));
+}// TODO: Call load to display scores
 
+function clearScores(){
+    localStorage.clear();
+}// TODO: Make clear button on hiScore Layout
 
 function setHiScoreLayout(){
-
+    removeID("submit-form");
+    let storedScores = loadScore();
+    p('form removed, score loaded');
+    //p(storedScores);
 }
 
 
