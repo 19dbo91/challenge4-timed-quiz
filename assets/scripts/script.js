@@ -143,15 +143,16 @@ deck[3].setQuestion("String values must be enclosed within _____ when being assi
 deck[3].setAnswer(["commas", "curly brackets", "quotes", "parenthesis"],2);
 // #endregion
 
-//
+// #region Var Declarations 
 const mainID = document.getElementById("main");
 const titleID = document.getElementById("title");
 const timeID = document.getElementById("time");
 
 //Time controls
-let myTimer= 0;
+let intervalTimeID;
+let currentTime=0;
 const timePenalty = 10;
-const timeAllotted = 5;
+const timeAllotted = 75;
 const timeDelta = 1000; //num is in milliseconds for setInterval funct 
 
 //Home Page
@@ -159,21 +160,16 @@ const homeTitle="Coding Quiz Challenge";
 const homePrompt="Try to answer the following code-related questions within time limit\nKeep in mind that incorrect answer will penalize your score/time by ten seconds!"
 const startString="Start Quiz"
 
-//question
-let questionPointer=0;
-
-
 //Submission page
 const submitTitle="All done";
-let scorePrompt = `Your final score is ${time}.`
-const intials= "Enter initials: "
+const finalScore = "Your final score is "
 
 //Sound
 const wavCorrect = new Audio("./assets/sfx/correct.wav");
 const wavIncorrect = new Audio("./assets/sfx/incorrect.wav");
+// #endregion
 
-
-
+// #region HTML manipulations, General
 function createChildTag(parentTag, typeString){
     let childTag = document.createElement(typeString);
     parentTag.appendChild(childTag);
@@ -185,11 +181,16 @@ function setContent(tag,contentString){
 function setID(tag,idString){
     tag.setAttribute("id",idString);
 }
+function removeID(idString){
+    document.getElementById(idString).remove();
+}
+// #endregion
 
-
+// #region HTML manipulations, Specific
 function createList(parentTag, itemArray){
     let newParentList = createChildTag(parentTag,"ol");
     newParentList.setAttribute("id", "answers");
+    newParentList.addEventListener("click",chooseAnswer);
     createListItem(newParentList, itemArray);
 }
 function createListItem(parentList, array){
@@ -199,85 +200,146 @@ function createListItem(parentList, array){
         newListItem.setAttribute("data-index",i);
     };
 }
-
-/* Controls for page */
-
 function setPrompt(promptString){
     let promptTag = createChildTag(mainID,"pre");
     setContent(promptTag, promptString);
     setID(promptTag,"prompt");
 }
-function removeID(idString){
-    document.getElementById(idString).remove();
-}
 function createStartButton(){
-    let startButton = createChildTag(mainID,"p");
+    let startButton = createChildTag(mainID,"button");
     setID(startButton,"start");
     setContent(startButton,startString);
     startButton.addEventListener("click", onClickStart);
 }
+// #endregion
 
-function setList(answerArray){
-} //TODO on click answer with qLeft >0; or on start
-
-
-
-/*Initializing home page*/
-// TODO: diplaying start pages
-setContent(titleID,homeTitle);
+// #region Functions - Home
+let questionPointer = 0; //reset
+setContent(titleID, homeTitle);
 setPrompt(homePrompt);
 createStartButton();
 setContent(timeID,"00");
 
-/* Starting questions */
-// TODO: diplaying question pages
-//setContent(titleID, deck[0].question);
-//removeID("prompt"); removeID("start");
-//createList(mainID,deck[0].answer);
-
-
-//removeList(); //todo  
-//setContent(titleID, submitTitle);
-//setPrompt(scorePrompt);
-
-
-function getLocalData(){} // TODO: getting leaderboard on page load
-function setLocalData(){} // TODO: storing leaderboard locally
-
-
 function onClickStart(){
     startTimer(timeAllotted, timeDelta);
+    setQuestionLayout();
+}
+// #endregion
+
+// #region Functions - Questions
+function setQuestionLayout(){
+    setContent(titleID, deck[questionPointer].question);
+    removeID("prompt"); removeID("start");
+    createList(mainID,deck[questionPointer].answer); // ! post-op incrementing will break chooseAnswer
+}
+function chooseAnswer(event){
+    let myAnswer = event.target.dataset.index;
+    let correctAnswer = deck[questionPointer].correct;
+    if(myAnswer==correctAnswer){
+        answerRight();
+    }else {answerWrong();}
+    getNextQuestion();
+}
+function answerWrong(){
+    if (currentTime<10){
+        stopTimer();
+        currentTime=0; 
+    }else{currentTime -= timePenalty;} //! very rare case but time can go below 0
+    setContent(timeID,currentTime);
+    wavIncorrect.play();
+} //also decreases time/score on call  // TODO add footer flash
+function answerRight(){
+    wavCorrect.play();
+} // TODO add footer flash
+function getNextQuestion(){
+    if(++questionPointer >= deck.length){ p('out of questions');
+        stopTimer();
+        setSubmissionLayout();
+    } // Case - 0 questions left
+    else{
+        setContent(titleID, deck[questionPointer].question);
+        removeID("answers");
+        createList(mainID,deck[questionPointer].answer);
+    }
+    
+
+}
+// #endregion
+
+function setSubmissionLayout(){
+    removeID('answers');
+    setContent(titleID, submitTitle);
+    showNewScore();
+    addForm();
 }
 
+function showNewScore(){
+    let displayScore = createChildTag(mainID,"p");
+    displayScore.innerHTML= finalScore + currentTime+".";
+}
+
+function addForm(){
+    let formID= createChildTag(mainID,"form");
+    setID(formID, "submit-form");
+
+    let labelFor = createChildTag(formID,"label");
+    labelFor.setAttribute("for","intials");
+    setContent(labelFor,"Enter Initials: ");
+    
+    let textBox = createChildTag(formID,"input");
+    setID(textBox, "intials");
+    textBox.setAttribute("type","text");
+    textBox.setAttribute("name","initials");
+
+    let submitButton = createChildTag(formID,"button");
+    submitButton.setAttribute("type","submit");
+    setContent(submitButton,"Submit")
+    submitButton.addEventListener("click", onSubmit);
+}
+
+function onSubmit(event){
+    event.preventDefault();
+    p(event);
+    let textBox = document.getElementById("input");
+    let initials = textBox.initials;
+    p();
+    saveScore();
+    setHiScoreLayout();
+}
+
+
+function saveScore(){
+}
+function loadScore(){
+    let leaderboardArray=[];
+    return leaderboardArray;
+}
+
+
+function setHiScoreLayout(){
+
+}
 
 
 // Timer
 function startTimer(duration,updateFrequency){
-    setContent(timeID,duration);
-    myTimer = setInterval(update,updateFrequency);
+    
+    currentTime=duration;
+    setContent(timeID,currentTime);
+    intervalTimeID = setInterval(update,updateFrequency);
+
     function update(){
-        duration--;
-        setContent(timeID,duration);
-        if (duration <= 0){
+        currentTime--;
+        if (currentTime<0){currentTime=0;} //! preventing negative score
+        setContent(timeID,currentTime);
+        if (currentTime <= 0){
             stopTimer();
+            setSubmissionLayout();
         }else{};
     }
-
-
 }
-
 function stopTimer(){
-    clearInterval(myTimer);
-}// used tostop after out of question
-
-function createWavID(){
-    
+    clearInterval(intervalTimeID);
 }
 
-function answerWrong(){
-    time -= timeLoss;
-    wavIncorrect.play();
-}
-function answerRight(){
-    wavCorrect.play();
-}
+//end
