@@ -232,6 +232,28 @@ function onClickStart(){
     startTimer(timeAllotted, timeDelta);
     setQuestionLayout();
 }
+//#endregion
+
+// #region Timer
+function startTimer(duration,updateFrequency){
+    
+    currentTime=duration;
+    setContent(timeID,currentTime);
+    intervalTimeID = setInterval(update,updateFrequency);
+
+    function update(){
+        currentTime--;
+        if (currentTime<0){currentTime=0;} //! preventing negative score
+        setContent(timeID,currentTime);
+        if (currentTime <= 0){
+            stopTimer();
+            setSubmissionLayout();
+        }else{};
+    }
+}
+function stopTimer(){
+    if (intervalTimeID!=null){clearInterval(intervalTimeID)}; //possible source of error... stop an already clock?
+}
 // #endregion
 
 // #region Functions - Questions
@@ -252,8 +274,10 @@ function answerWrong(){
     if (currentTime<10){
         stopTimer();
         currentTime=0; 
-    }else{currentTime -= timePenalty;} //! very rare case but time can go below 0
+    }else{currentTime -= timePenalty;} //! very rare case but time can go below 0 //Not the source of the reference eror
     setContent(timeID,currentTime);
+    
+
     wavIncorrect.play();
 } //also decreases time/score on call  // TODO add footer flash
 function answerRight(){
@@ -274,18 +298,17 @@ function getNextQuestion(){
 }
 // #endregion
 
+// #region Submission and 
 function setSubmissionLayout(){
     removeID('answers');
     setContent(titleID, submitTitle);
     showNewScore();
     addForm();
 }
-
 function showNewScore(){
     let displayScore = createChildTag(mainID,"p");
     displayScore.innerHTML= finalScore + currentTime+".";
 }
-
 function addForm(){
     let formID= createChildTag(mainID,"form");
     setID(formID, "submit-form");
@@ -307,13 +330,15 @@ function addForm(){
     setContent(submitButton,"Submit")
     submitButton.addEventListener("click", onSubmit);
 }
-
 function onSubmit(event){
     event.preventDefault();
     saveScore();
 }//possible err due to something?? may need to nest
+//#endregion
 
-
+function loadScore(){ //moved load here in code, seems to minize the reference error in save
+    return JSON.parse(localStorage.getItem("hiScore"));
+}// TODO: Call load to display scores
 
 function saveScore(){
     player.initials= document.getElementById("initials").value;
@@ -331,12 +356,12 @@ function saveScore(){
     else{
         let placement = 0;
 
-        p("last best: "+ previousSave[0].value);
+        p("last best: "+ previousSave[0].score);
         p("this time: " + player.score);
         let pastScore = previousSave[placement].score;
         while(pastScore >= (player.score)){
             placement++;
-            pastScore = previousSave[placement].score; // ! errors when taken to fast??
+            pastScore = previousSave[placement].score; // ! ERROR: Clicking answers to fast causes a reference error; refresh and slow down
         }//checking where to place new score; new scores that equal old will be placed below
 
         p("you have placed "+ (placement+1)+"th");
@@ -351,10 +376,6 @@ function saveScore(){
 }
 
 
-function loadScore(){
-    return JSON.parse(localStorage.getItem("hiScore"));
-}// TODO: Call load to display scores
-
 function clearScores(){
     localStorage.clear();
 }// TODO: Make clear button on hiScore Layout
@@ -367,25 +388,5 @@ function setHiScoreLayout(){
 }
 
 
-// Timer
-function startTimer(duration,updateFrequency){
-    
-    currentTime=duration;
-    setContent(timeID,currentTime);
-    intervalTimeID = setInterval(update,updateFrequency);
-
-    function update(){
-        currentTime--;
-        if (currentTime<0){currentTime=0;} //! preventing negative score
-        setContent(timeID,currentTime);
-        if (currentTime <= 0){
-            stopTimer();
-            setSubmissionLayout();
-        }else{};
-    }
-}
-function stopTimer(){
-    clearInterval(intervalTimeID);
-}
 
 //end
