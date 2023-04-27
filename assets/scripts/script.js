@@ -106,6 +106,8 @@ on reset
  * attribute - required for input tag <https://bobbyhadz.com/blog/javascript-set-attribute-required>
 */ 
 
+// Ideas for improvement: storing objects in array and calling each for the page to refer to load
+
 
 //Debug printer
 function p(me){console.log(me);}
@@ -151,16 +153,19 @@ const titleID = document.getElementById("title");
 const timeID = document.getElementById("time");
 
 //Time controls
-let intervalTimeID;
+let intervalTimeID=0;
 let currentTime=0;
-const timePenalty = 10;
+const timePenalty = 15;
 const timeAllotted = 75;
 const timeDelta = 1000; //num is in milliseconds for setInterval funct 
 
 //Home Page
 const homeTitle="Coding Quiz Challenge";
-const homePrompt="Try to answer the following code-related questions within time limit\nKeep in mind that incorrect answer will penalize your score/time by ten seconds!"
-const startString="Start Quiz"
+const homePrompt=`Try to answer the following code-related questions within time limit\nKeep in mind that incorrect answer will penalize your score/time by ${timePenalty} seconds!`;
+const startString="Start Quiz";
+
+//Question Page
+let questionPointer = 0; 
 
 //Submission page
 const submitTitle="All done";
@@ -171,6 +176,10 @@ let player={
     'initials': "",
     'score': 0
 };
+
+//Hi-Score Page
+const backButtonString="Go Back";
+const clearButtonString="Clear high scores";
 
 //Sound
 const wavCorrect = new Audio("./assets/sfx/correct.wav");
@@ -197,7 +206,7 @@ function removeID(idString){
 // #region HTML manipulations, Specific
 function createList(parentTag, itemArray){
     let newParentList = createChildTag(parentTag,"ol");
-    newParentList.setAttribute("id", "answers");
+    setID(newParentList, "answers");
     newParentList.addEventListener("click",chooseAnswer);
     createListItem(newParentList, itemArray);
 }
@@ -222,11 +231,16 @@ function createStartButton(){
 // #endregion
 
 // #region Functions - Home
-let questionPointer = 0; //reset
-setContent(titleID, homeTitle);
-setPrompt(homePrompt);
-createStartButton();
-setContent(timeID,"00");
+function init(){
+    questionPointer = 0;
+    currentTime = 0;
+    //all need values reset
+    setContent(titleID, homeTitle);
+    setPrompt(homePrompt);
+    createStartButton();
+    setContent(timeID,"00");
+}
+
 
 function onClickStart(){
     startTimer(timeAllotted, timeDelta);
@@ -307,7 +321,8 @@ function setSubmissionLayout(){
 }
 function showNewScore(){
     let displayScore = createChildTag(mainID,"p");
-    displayScore.innerHTML= finalScore + currentTime+".";
+    setID(displayScore,"display-score")
+    displayScore.innerHTML= `${finalScore} ${currentTime}.`;
 }
 function addForm(){
     let formID= createChildTag(mainID,"form");
@@ -345,7 +360,7 @@ function saveScore(){
     player.score=currentTime;
 
     let previousSave = loadScore();
-    p(previousSave);
+    //p(previousSave);
 
 
     if( previousSave == null){
@@ -356,15 +371,15 @@ function saveScore(){
     else{
         let placement = 0;
 
-        p("last best: "+ previousSave[0].score);
-        p("this time: " + player.score);
+        //p("last best: "+ previousSave[0].score);
+        //p("this time: " + player.score);
         let pastScore = previousSave[placement].score;
         while(pastScore >= (player.score)){
             placement++;
             pastScore = previousSave[placement].score; // ! ERROR: Clicking answers to fast causes a reference error; refresh and slow down
         }//checking where to place new score; new scores that equal old will be placed below
-
-        p("you have placed "+ (placement+1)+"th");
+        //p("you have placed "+ (placement+1)+"th");
+        
         previousSave.splice(placement,0,player);
         
         while(previousSave.length>5){
@@ -381,12 +396,43 @@ function clearScores(){
 }// TODO: Make clear button on hiScore Layout
 
 function setHiScoreLayout(){
-    removeID("submit-form");
+    removeID("submit-form");removeID("display-score");
     let storedScores = loadScore();
-    p('form removed, score loaded');
-    //p(storedScores);
+    setContent(titleID,"High Scores");
+    //p('form removed, score loaded');
+    p(storedScores);
+    createLeaderboard();
+    createLeaderboardMenu();
+
+    
+
+}
+
+function createLeaderboard(){
+
+}
+
+
+function createLeaderboardMenu(){
+    let menuID = createChildTag(mainID,"menu");
+    setID(menuID,"menu");
+    menuID.setAttribute("style", "display: flex;list-style: none;");
+
+    let backID = createChildTag(menuID,"li");
+    setID(backID,"go-back"); 
+
+    let backBtn = createChildTag(backID,"button");
+    setID(backBtn,"back-btn"); setContent(backBtn,backButtonString);
+    
+
+    let clearID=createChildTag(menuID,"li");
+    setID(clearID,"clear-hi-scores");
+
+    let clearBtn=createChildTag(clearID,"button");
+    setID(clearBtn,"clear-btn"); setContent(clearBtn,clearButtonString);
 }
 
 
 
+init();
 //end
