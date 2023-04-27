@@ -1,9 +1,12 @@
 :root{
     --themecolor-default:purple;
-    --themecolor-hover:purple;
+    --themecolor-hover:rgb(119, 80, 119);
     --themecolor-:purple;
 }
 
+li{
+    margin: 10px;
+}
 
 header{
     display: flex;

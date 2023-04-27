@@ -12,19 +12,19 @@ ACC CRIT
 _______________________________________________________________________________
 .:  I am taking a code quiz
 
-@ click the start button:
+@ click the start button: //! DONE !
     THEN a timer starts and I am presented with a question
 
-@ answer a question:
+@ answer a question: //! DONE !
     THEN I am presented with another question
 
-@ answer a question incorrectly:
+@ answer a question incorrectly: //! DONE !
     THEN time is subtracted from the clock
 
-@ all questions are answered or the timer reaches 0:
+@ all questions are answered or the timer reaches 0: //! DONE !
     THEN the game is over
 
-@ the game is over:
+@ the game is over: //TODO: ERROR
     THEN I can save my initials and my score //local storage
 
 
@@ -106,7 +106,10 @@ on reset
  * attribute - required for input tag <https://bobbyhadz.com/blog/javascript-set-attribute-required>
 */ 
 
-// Ideas for improvement: storing objects in array and calling each for the page to refer to load
+// TODO: Ideas for improvement/Lessons Learned: 
+/* in creation of tag or adding id to tag: add id to array to track and make removing easier;
+ * a lot of extra code stem from me trying to make it more readable to me, could be less wordy, could be structured better/with less lines
+ */
 
 
 //Debug printer
@@ -148,9 +151,11 @@ deck[3].setAnswer(["commas", "curly brackets", "quotes", "parenthesis"],2);
 // #endregion
 
 // #region Var Declarations 
+const headerID = document.querySelector("header");
 const mainID = document.getElementById("main");
 const titleID = document.getElementById("title");
 const timeID = document.getElementById("time");
+
 
 //Time controls
 let intervalTimeID=0;
@@ -199,7 +204,8 @@ function setID(tag,idString){
     tag.setAttribute("id",idString);
 }
 function removeID(idString){
-    document.getElementById(idString).remove();
+    let trash = document.getElementById(idString);
+    if(trash!=null){trash.remove();}
 }
 // #endregion
 
@@ -228,20 +234,30 @@ function createStartButton(){
     setContent(startButton,startString);
     startButton.addEventListener("click", onClickStart);
 }
+function hideHeader(){
+    headerID.setAttribute("style","visibility: hidden");
+}
+function showHeader(){
+    headerID.setAttribute("style","visibility: visible");
+}
+
+
 // #endregion
 
-// #region Functions - Home
+// #region Home Functions
 function init(){
+    // Resets
     questionPointer = 0;
     currentTime = 0;
-    //all need values reset
+    removeID("menu");
+
+    // Draw page
+    showHeader();
     setContent(titleID, homeTitle);
     setPrompt(homePrompt);
     createStartButton();
     setContent(timeID,"00");
 }
-
-
 function onClickStart(){
     startTimer(timeAllotted, timeDelta);
     setQuestionLayout();
@@ -270,7 +286,7 @@ function stopTimer(){
 }
 // #endregion
 
-// #region Functions - Questions
+// #region Question Functions
 function setQuestionLayout(){
     setContent(titleID, deck[questionPointer].question);
     removeID("prompt"); removeID("start");
@@ -312,7 +328,7 @@ function getNextQuestion(){
 }
 // #endregion
 
-// #region Submission and 
+// #region Submission/
 function setSubmissionLayout(){
     removeID('answers');
     setContent(titleID, submitTitle);
@@ -351,10 +367,11 @@ function onSubmit(event){
 }//possible err due to something?? may need to nest
 //#endregion
 
-function loadScore(){ //moved load here in code, seems to minize the reference error in save
-    return JSON.parse(localStorage.getItem("hiScore"));
-}// TODO: Call load to display scores
 
+// #region Scoring/Leaderboard Functions
+function loadScore(){ 
+    return JSON.parse(localStorage.getItem("hiScore"));
+}
 function saveScore(){
     player.initials= document.getElementById("initials").value;
     player.score=currentTime;
@@ -388,14 +405,13 @@ function saveScore(){
         localStorage.setItem("hiScore",JSON.stringify(previousSave));
     }
     setHiScoreLayout();
-}
-
+} // ! ERROR: Clicking answers to fast causes a reference error; refresh and slow down
 
 function clearScores(){
-    localStorage.clear();
-}// TODO: Make clear button on hiScore Layout
-
+    localStorage.clear(); //p("cleared!")
+}
 function setHiScoreLayout(){
+    hideHeader();
     removeID("submit-form");removeID("display-score");
     let storedScores = loadScore();
     setContent(titleID,"High Scores");
@@ -403,16 +419,10 @@ function setHiScoreLayout(){
     p(storedScores);
     createLeaderboard();
     createLeaderboardMenu();
-
-    
-
 }
-
 function createLeaderboard(){
-
+    let leaderboardArray = loadScore();
 }
-
-
 function createLeaderboardMenu(){
     let menuID = createChildTag(mainID,"menu");
     setID(menuID,"menu");
@@ -423,15 +433,16 @@ function createLeaderboardMenu(){
 
     let backBtn = createChildTag(backID,"button");
     setID(backBtn,"back-btn"); setContent(backBtn,backButtonString);
-    
+    backBtn.addEventListener("click",init);
 
     let clearID=createChildTag(menuID,"li");
     setID(clearID,"clear-hi-scores");
 
     let clearBtn=createChildTag(clearID,"button");
     setID(clearBtn,"clear-btn"); setContent(clearBtn,clearButtonString);
+    clearBtn.addEventListener("click",clearScores);//update screen
 }
-
+// #endregion
 
 
 init();
