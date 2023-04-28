@@ -21,8 +21,8 @@
 * ////@ all questions are answered or the timer reaches 0: //! DONE !
 * ////THEN the game is over
 * 
-* @ the game is over: //TODO: ERROR
-*      THEN I can save my initials and my score //local storage
+* ////@ the game is over:
+*     //// THEN I can save my initials and my score //local storage
 */
 
 /*      NOTES ON MOCK UP
@@ -97,12 +97,17 @@
  * Regions <https://marketplace.visualstudio.com/items?itemName=MadsKristensen.JavaScriptRegions>
  * innerHTML vs textContent <https://www.youtube.com/watch?v=1UsllDMhvN4>
  * splice <https://www.freecodecamp.org/news/javascript-splice-how-to-use-the-splice-js-array-method/>
- * attribute - required for input tag <https://bobbyhadz.com/blog/javascript-set-attribute-required>
 */ 
 
 /* //   TODO: Ideas for improvement/Lessons Learned:
 * in creation of tag or adding id to tag: add id to array to track and make removing easier;
 * a lot of extra code stem from me trying to make it more readable to me, could be less wordy, could be structured better/with less lines
+* //! the erro found was a reference error in loop regarding ptr outside of array bounds
+* this would be more apparent to me if i had taken slower time understanding the steps in the loop explicitly with every case
+* the TAs helped point out it would produce an error on every 2nd pass b.c it would loop correctly on a null detected
+* on the second pass it would see the first element and require move right but then try to check again for score
+* there is no other score. 
+* TL;DR - accessing the 4th element in an array size 3... impossibru
 */
 
 
@@ -374,22 +379,32 @@ function saveScore(){
     //p(previousSave);
 
 
-    if( previousSave == null){
-        let newLeader = [player];
+    if( previousSave == null){ //test for triple eq null
+        let newLeader = [player]; //else needs array 
         localStorage.setItem("hi-score",JSON.stringify(newLeader));
         //p("!! NEW HIGH SCORE !!");
     }
     else{
-        let placement = 0;
+        let placement=0;
 
-        //p("last best: "+ previousSave[0].score);
-        //p("this time: " + player.score);
-        let pastScore = previousSave[placement].score;
-        while(pastScore >= (player.score)){
+        for(let i = 0; i < previousSave.length; i++){
+            if(previousSave[i]!= undefined){
+                p(previousSave[i]);
+                let savedScore = previousSave[i].score;
+                if(player.score<= savedScore){
+                    placement++;
+                }
+            }
+        } 
+        //whether the 
+       
+        /* // !erroneous code
+        while(savedScore >= (player.score)){
             placement++;
-            pastScore = previousSave[placement].score; // ! ERROR: Clicking answers to fast causes a reference error; refresh and slow down
+            
+            savedScore = previousSave[placement].score;//! here outside of array sometimes
         }//checking where to place new score; new scores that equal old will be placed below
-        //p("you have placed "+ (placement+1)+"th");
+        */
         
         previousSave.splice(placement,0,player);
         
@@ -400,7 +415,6 @@ function saveScore(){
     }
     setHiScoreLayout();
 } // takes current score and sorts it against old scores and then saves it to local ONLY if in top range
-// ! ERROR: Clicking answers to fast causes a reference error; refresh and slow down
 
 function clearScores(){
     localStorage.clear(); //p("cleared!")
@@ -448,6 +462,8 @@ function createLeaderboardMenu(){
     setID(clearBtn,"clear-btn"); setContent(clearBtn,clearButtonString);
     clearBtn.addEventListener("click",clearScores);//update screen
 }
+
+
 // #endregion
 
 
