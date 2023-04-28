@@ -18,7 +18,7 @@ None.
 ## Usage
 
 In your preferred browser, navigate to the url:
-<https://github.com/19dbo91/challenge4-timed-quiz>
+<https://19dbo91.github.io/challenge4-timed-quiz/>
 
 ![home page of coding quiz challenge](assets/images/page-01-home.png)
 
