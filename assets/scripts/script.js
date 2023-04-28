@@ -243,6 +243,7 @@ function init(){
     questionPointer = 0;
     currentTime = 0;
     removeID("menu");
+    removeID("leaderboard");
 
     // Draw page
     showHeader();
